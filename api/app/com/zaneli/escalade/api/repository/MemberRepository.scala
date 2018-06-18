@@ -4,27 +4,18 @@ import com.zaneli.escalade.api.entity.{CompanyEntity, HasId, HasVersion, MemberE
 import com.zaneli.escalade.api.persistence.Member
 import scalikejdbc._
 
-import scala.util.control.NonFatal
-
 class MemberRepository {
 
   def save(entity: MemberEntity, companyId: Long)(implicit s: DBSession): Result[Long] = {
     val column = Member.column
-    try {
-      entity match {
-        case m: HasId[Long] with HasVersion =>
-          val count = Member.updateByIdAndVersion(m.id, m.version)
-            .withNamedValues(column.name -> m.name, column.companyId -> companyId)
-          UpdateSuccess(count)
-        case m =>
-          val id = Member.createWithNamedValues(
-            column.name -> m.name,
-            column.companyId -> companyId
-          )
-          InsertSuccess(id)
-      }
-    } catch {
-      case NonFatal(e) => Failure(e)
+    insertOrOptimisticLockUpdate(entity) {
+      Member.createWithNamedValues(
+        column.name -> entity.name,
+        column.companyId -> companyId
+      )
+    } { e =>
+      Member.updateByIdAndVersion(e.id, e.version)
+        .withNamedValues(column.name -> entity.name, column.companyId -> companyId)
     }
   }
 
