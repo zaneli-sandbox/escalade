@@ -12,26 +12,21 @@ class CompanyRepositorySpec extends Specification with DBSetup {
   private[this] val repo = new CompanyRepository()
 
   trait AutoRollbackWithFixture extends AutoRollback with After {
-    override def fixture(implicit session: DBSession): Unit = {
-      sql"""
-         |INSERT INTO companies (`id`, `name`) VALUES (1, 'test_company_1')
-       """.stripMargin.update.apply()
-      ()
-    }
+    override def fixture(implicit session: DBSession): Unit = DBSetup.fixture
   }
 
   sequential
 
   "CompanyRepository.selectById" should {
     "存在するIDを指定" in new AutoRollbackWithFixture {
-      repo.selectById(1) must beSome.which { c =>
+      repo.selectById(1L) must beSome.which { c =>
         c.id must_== 1L
         c.name must_== "test_company_1"
         c.version must_== 1L
       }
     }
     "存在しないIDを指定" in new AutoRollbackWithFixture {
-      repo.selectById(-1) must beNone
+      repo.selectById(-1L) must beNone
     }
   }
 
@@ -45,18 +40,18 @@ class CompanyRepositorySpec extends Specification with DBSetup {
       repo.selectById(id) must beSome(entity)
     }
     "更新" in new AutoRollbackWithFixture {
-      repo.selectById(1) must beSome.which { c =>
+      repo.selectById(1L) must beSome.which { c =>
         val entity = CompanyEntity(c.id, "updated_company", c.version)
         repo.save(entity) must_== UpdateSuccess(1)
 
-        repo.selectById(1) must beSome.which { u =>
+        repo.selectById(entity.id) must beSome.which { u =>
           u.name must_== entity.name
           u.version must_== c.version + 1
         }
       }
     }
     "楽観ロックエラー" in new AutoRollbackWithFixture {
-      repo.selectById(1) must beSome.which { c =>
+      repo.selectById(1L) must beSome.which { c =>
         val entity = CompanyEntity(c.id, "updated_company", c.version + 1L)
         val result = repo.save(entity)
         result must beAnInstanceOf[Failure]
@@ -64,7 +59,7 @@ class CompanyRepositorySpec extends Specification with DBSetup {
         val Failure(t) = result
         t must beAnInstanceOf[OptimisticLockException]
 
-        repo.selectById(1) must beSome(CompanyEntity("test_company_1"))
+        repo.selectById(entity.id) must beSome(CompanyEntity("test_company_1"))
       }
     }
   }

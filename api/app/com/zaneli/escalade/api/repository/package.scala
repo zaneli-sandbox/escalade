@@ -16,7 +16,7 @@ package object repository {
       case e: OptimisticLockUpdateParam =>
         val count = update(e)
         UpdateSuccess(count)
-      case e =>
+      case _ =>
         val id = insert
         InsertSuccess(id)
     }
