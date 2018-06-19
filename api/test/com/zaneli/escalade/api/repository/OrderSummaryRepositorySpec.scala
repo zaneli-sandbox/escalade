@@ -44,16 +44,17 @@ class OrderSummaryRepositorySpec extends Specification with DBSetup {
       val now = LocalDateTime.now()
       val entity = OrderSummaryEntity(MemberId(1L), OrderStatus.Settled, now, now.some, Nil)
       val result = repo.save(entity)
-      result must beAnInstanceOf[InsertSuccess[OrderSummaryId]]
-
-      val InsertSuccess(id) = result
-      repo.selectById(id) must beSome(entity)
+      result must beRight.which {
+        case InsertSuccess(id) => repo.selectById(id) must beSome(entity)
+        case _ => ko
+      }
     }
     "更新" in new AutoRollbackWithFixture {
       val now = LocalDateTime.now()
       repo.selectById(OrderSummaryId(1L)) must beSome.which { s =>
         val entity = OrderSummaryEntity(s.id, MemberId(2L), OrderStatus.Settled, now, now.some, Nil, s.version)
-        repo.save(entity) must_== UpdateSuccess(1)
+        val result = repo.save(entity)
+        result must beRight(UpdateSuccess(1))
 
         repo.selectById(entity.id) must beSome.which { u =>
           u.orderDate must_== entity.orderDate
@@ -68,10 +69,7 @@ class OrderSummaryRepositorySpec extends Specification with DBSetup {
       repo.selectById(OrderSummaryId(1L)) must beSome.which { s =>
         val entity = OrderSummaryEntity(s.id, MemberId(2L), OrderStatus.Settled, now, now.some, Nil, s.version + 1)
         val result = repo.save(entity)
-        result must beAnInstanceOf[Failure]
-
-        val Failure(t) = result
-        t must beAnInstanceOf[OptimisticLockException]
+        result must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
 
         repo.selectById(entity.id) must beSome.which { u =>
           u.orderer must_== MemberId(1L)

@@ -35,15 +35,16 @@ class CompanyRepositorySpec extends Specification with DBSetup {
     "新規作成" in new AutoRollbackWithFixture {
       val entity = CompanyEntity("inserted_company")
       val result = repo.save(entity)
-      result must beAnInstanceOf[InsertSuccess[CompanyId]]
-
-      val InsertSuccess(id) = result
-      repo.selectById(id) must beSome(entity)
+      result must beRight.which {
+        case InsertSuccess(id) => repo.selectById(id) must beSome(entity)
+        case _ => ko
+      }
     }
     "更新" in new AutoRollbackWithFixture {
       repo.selectById(CompanyId(1L)) must beSome.which { c =>
         val entity = CompanyEntity(c.id, "updated_company", c.version)
-        repo.save(entity) must_== UpdateSuccess(1)
+        val result = repo.save(entity)
+        result must beRight(UpdateSuccess(1))
 
         repo.selectById(entity.id) must beSome.which { u =>
           u.name must_== entity.name
@@ -55,10 +56,7 @@ class CompanyRepositorySpec extends Specification with DBSetup {
       repo.selectById(CompanyId(1L)) must beSome.which { c =>
         val entity = CompanyEntity(c.id, "updated_company", c.version + 1L)
         val result = repo.save(entity)
-        result must beAnInstanceOf[Failure]
-
-        val Failure(t) = result
-        t must beAnInstanceOf[OptimisticLockException]
+        result must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
 
         repo.selectById(entity.id) must beSome(CompanyEntity("test_company_1"))
       }

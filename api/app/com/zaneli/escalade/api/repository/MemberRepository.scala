@@ -6,7 +6,7 @@ import scalikejdbc._
 
 class MemberRepository extends InsertOrOptimisticLockUpdate[MemberEntity, MemberId] {
 
-  def save(entity: MemberEntity, companyId: CompanyId)(implicit s: DBSession): Result[MemberId] = {
+  def save(entity: MemberEntity, companyId: CompanyId)(implicit s: DBSession): Either[Throwable, Result[MemberId]] = {
     val column = Member.column
     insertOrUpdate(entity) { e =>
       val id = Member.createWithNamedValues(

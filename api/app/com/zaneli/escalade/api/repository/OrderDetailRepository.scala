@@ -4,13 +4,13 @@ import com.zaneli.escalade.api.entity.{ItemId, OrderDetailEntity, OrderSummaryId
 import com.zaneli.escalade.api.persistence.OrderDetail
 import scalikejdbc._
 
-import scala.util.control.NonFatal
+import scala.util.control.Exception
 
 class OrderDetailRepository {
 
-  def save(entity: OrderDetailEntity)(implicit s: DBSession): Result[Unit] = {
+  def save(entity: OrderDetailEntity)(implicit s: DBSession): Either[Throwable, Result[Unit]] = {
     val column = OrderDetail.column
-    try {
+    Exception.nonFatalCatch.either {
       OrderDetail.createWithNamedValues(
         column.summaryId -> entity.summaryId,
         column.itemId -> entity.itemId,
@@ -19,8 +19,6 @@ class OrderDetailRepository {
         column.price -> entity.price
       )
       InsertSuccess(())
-    } catch {
-      case NonFatal(t) => Failure(t)
     }
   }
 

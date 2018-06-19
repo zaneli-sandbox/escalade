@@ -6,7 +6,7 @@ import scalikejdbc.DBSession
 
 class OrderSummaryRepository extends InsertOrOptimisticLockUpdate[OrderSummaryEntity, OrderSummaryId] {
 
-  def save(entity: OrderSummaryEntity)(implicit s: DBSession): Result[OrderSummaryId] = {
+  def save(entity: OrderSummaryEntity)(implicit s: DBSession): Either[Throwable, Result[OrderSummaryId]] = {
     val column = OrderSummary.column
     insertOrUpdate(entity) { e =>
       val id = OrderSummary.createWithNamedValues(

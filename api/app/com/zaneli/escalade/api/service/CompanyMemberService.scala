@@ -1,28 +1,24 @@
 package com.zaneli.escalade.api.service
 
 import com.zaneli.escalade.api.entity.{CompanyId, HasId, MemberEntity}
-import com.zaneli.escalade.api.repository.{CompanyRepository, Failure, InsertSuccess, MemberRepository, UpdateSuccess}
+import com.zaneli.escalade.api.repository.{CompanyRepository, InsertSuccess, MemberRepository, UpdateSuccess}
 import scalikejdbc.DB
 
 class CompanyMemberService(cr: CompanyRepository, mr: MemberRepository) {
 
   def save(member: MemberEntity): Either[Throwable, Unit] = {
     DB.localTx { implicit s =>
-      cr.save(member.company) match {
+      cr.save(member.company).flatMap {
         case InsertSuccess(id) =>
           mr.save(member, id)
-          Right(())
         case UpdateSuccess(_) =>
           member.company match {
             case c: HasId[CompanyId] =>
               mr.save(member, c.id)
-              Right(())
             case _ =>
               Left(new RuntimeException(s"unexpected member entity: $member"))
           }
-        case Failure(t) =>
-          Left(t)
-      }
+      }.map(_ => ())
     }
   }
 }

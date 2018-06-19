@@ -37,7 +37,7 @@ class OrderDetailRepositorySpec extends Specification with DBSetup {
 
       val additinal = OrderDetailEntity(id, ItemId(2L), 5, Rate(3), Price(727.5))
       val result = repo.save(additinal)
-      result must beAnInstanceOf[InsertSuccess[Unit]]
+      result must beRight(InsertSuccess(()))
 
       repo.selectBySummaryId(id).sortBy(_.itemId) must_== List(initial, additinal)
     }
@@ -51,7 +51,7 @@ class OrderDetailRepositorySpec extends Specification with DBSetup {
 
       val entity = OrderDetailEntity(id, ItemId(1L), 5, Rate(3), Price(727.5))
       val result = repo.save(entity)
-      result must beAnInstanceOf[Failure]
+      result must beLeft
 
       repo.selectBySummaryId(id).sortBy(_.itemId) must_== initials
     }

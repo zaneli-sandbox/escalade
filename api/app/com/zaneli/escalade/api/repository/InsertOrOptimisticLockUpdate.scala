@@ -2,22 +2,18 @@ package com.zaneli.escalade.api.repository
 
 import com.zaneli.escalade.api.entity.{EntityWithPK, HasId, HasVersion}
 
-import scala.util.control.NonFatal
+import scala.util.control.Exception
 
 trait InsertOrOptimisticLockUpdate[A <: EntityWithPK[ID], ID] {
 
   type UpdateParam = HasId[ID] with HasVersion
 
-  private[repository] def insertOrUpdate(entity: A)(insert: A => ID)(update: UpdateParam => Int): Result[ID] = try {
-    entity match {
-      case e: UpdateParam =>
-        val count = update(e)
-        UpdateSuccess(count)
-      case e =>
-        val id = insert(e)
-        InsertSuccess(id)
+  private[repository] def insertOrUpdate(entity: A)(insert: A => ID)(update: UpdateParam => Int): Either[Throwable, Result[ID]] = {
+    Exception.nonFatalCatch.either {
+      entity match {
+        case e: UpdateParam => UpdateSuccess(update(e))
+        case e => InsertSuccess(insert(e))
+      }
     }
-  } catch {
-    case NonFatal(t) => Failure(t)
   }
 }

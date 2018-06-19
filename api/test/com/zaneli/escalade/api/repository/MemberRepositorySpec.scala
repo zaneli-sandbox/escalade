@@ -50,15 +50,16 @@ class MemberRepositorySpec extends Specification with DBSetup {
     "新規作成" in new AutoRollbackWithFixture {
       val entity = MemberEntity("inserted_member", CompanyEntity("test_company_1"))
       val result = repo.save(entity, CompanyId(1L))
-      result must beAnInstanceOf[InsertSuccess[MemberId]]
-
-      val InsertSuccess(id) = result
-      repo.selectById(id) must beSome(entity)
+      result must beRight.which {
+        case InsertSuccess(id) => repo.selectById(id) must beSome(entity)
+        case _ => ko
+      }
     }
     "更新" in new AutoRollbackWithFixture {
       repo.selectById(MemberId(1L)) must beSome.which { m =>
         val entity = MemberEntity(m.id, "updated_member", CompanyEntity("test_company_1"), m.version)
-        repo.save(entity, CompanyId(1L)) must_== UpdateSuccess(1)
+        val result = repo.save(entity, CompanyId(1L))
+        result must beRight(UpdateSuccess(1))
 
         repo.selectById(entity.id) must beSome.which { u =>
           u.name must_== entity.name
@@ -70,10 +71,7 @@ class MemberRepositorySpec extends Specification with DBSetup {
       repo.selectById(MemberId(1L)) must beSome.which { m =>
         val entity = MemberEntity(m.id, "updated_member", CompanyEntity("test_company_1"), m.version + 1)
         val result = repo.save(entity, CompanyId(1L))
-        result must beAnInstanceOf[Failure]
-
-        val Failure(t) = result
-        t must beAnInstanceOf[OptimisticLockException]
+        result must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
 
         repo.selectById(entity.id) must beSome(MemberEntity("test_member_1_1", CompanyEntity("test_company_1")))
       }

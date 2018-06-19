@@ -6,7 +6,7 @@ import scalikejdbc.DBSession
 
 class CompanyRepository extends InsertOrOptimisticLockUpdate[CompanyEntity, CompanyId] {
 
-  def save(entity: CompanyEntity)(implicit s: DBSession): Result[CompanyId] = {
+  def save(entity: CompanyEntity)(implicit s: DBSession): Either[Throwable, Result[CompanyId]] = {
     val column = Company.column
     insertOrUpdate(entity) { e =>
       CompanyId(Company.createWithNamedValues(column.name -> e.name))
