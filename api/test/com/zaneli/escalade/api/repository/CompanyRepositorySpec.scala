@@ -1,6 +1,6 @@
 package com.zaneli.escalade.api.repository
 
-import com.zaneli.escalade.api.entity.CompanyEntity
+import com.zaneli.escalade.api.entity.{CompanyEntity, CompanyId}
 import db.DBSetup
 import org.specs2.mutable.{After, Specification}
 import scalikejdbc._
@@ -19,14 +19,15 @@ class CompanyRepositorySpec extends Specification with DBSetup {
 
   "CompanyRepository.selectById" should {
     "存在するIDを指定" in new AutoRollbackWithFixture {
-      repo.selectById(1L) must beSome.which { c =>
-        c.id must_== 1L
+      val id = CompanyId(1L)
+      repo.selectById(id) must beSome.which { c =>
+        c.id must_== id
         c.name must_== "test_company_1"
         c.version must_== 1L
       }
     }
     "存在しないIDを指定" in new AutoRollbackWithFixture {
-      repo.selectById(-1L) must beNone
+      repo.selectById(CompanyId(-1L)) must beNone
     }
   }
 
@@ -34,13 +35,13 @@ class CompanyRepositorySpec extends Specification with DBSetup {
     "新規作成" in new AutoRollbackWithFixture {
       val entity = CompanyEntity("inserted_company")
       val result = repo.save(entity)
-      result must beAnInstanceOf[InsertSuccess[Long]]
+      result must beAnInstanceOf[InsertSuccess[CompanyId]]
 
       val InsertSuccess(id) = result
       repo.selectById(id) must beSome(entity)
     }
     "更新" in new AutoRollbackWithFixture {
-      repo.selectById(1L) must beSome.which { c =>
+      repo.selectById(CompanyId(1L)) must beSome.which { c =>
         val entity = CompanyEntity(c.id, "updated_company", c.version)
         repo.save(entity) must_== UpdateSuccess(1)
 
@@ -51,7 +52,7 @@ class CompanyRepositorySpec extends Specification with DBSetup {
       }
     }
     "楽観ロックエラー" in new AutoRollbackWithFixture {
-      repo.selectById(1L) must beSome.which { c =>
+      repo.selectById(CompanyId(1L)) must beSome.which { c =>
         val entity = CompanyEntity(c.id, "updated_company", c.version + 1L)
         val result = repo.save(entity)
         result must beAnInstanceOf[Failure]

@@ -1,6 +1,6 @@
 package com.zaneli.escalade.api.service
 
-import com.zaneli.escalade.api.entity.{HasId, MemberEntity}
+import com.zaneli.escalade.api.entity.{CompanyId, HasId, MemberEntity}
 import com.zaneli.escalade.api.repository.{CompanyRepository, Failure, InsertSuccess, MemberRepository, UpdateSuccess}
 import scalikejdbc.DB
 
@@ -14,7 +14,7 @@ class CompanyMemberService(cr: CompanyRepository, mr: MemberRepository) {
           Right(())
         case UpdateSuccess(_) =>
           member.company match {
-            case c: HasId[Long] =>
+            case c: HasId[CompanyId] =>
               mr.save(member, c.id)
               Right(())
             case _ =>

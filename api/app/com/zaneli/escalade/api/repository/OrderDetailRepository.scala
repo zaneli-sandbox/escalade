@@ -1,6 +1,6 @@
 package com.zaneli.escalade.api.repository
 
-import com.zaneli.escalade.api.entity.OrderDetailEntity
+import com.zaneli.escalade.api.entity.{ItemId, OrderDetailEntity, OrderSummaryId}
 import com.zaneli.escalade.api.persistence.OrderDetail
 import scalikejdbc._
 
@@ -24,10 +24,10 @@ class OrderDetailRepository {
     }
   }
 
-  def selectBySummaryId(summaryId: Long)(implicit s: DBSession): List[OrderDetailEntity] = {
+  def selectBySummaryId(summaryId: OrderSummaryId)(implicit s: DBSession): List[OrderDetailEntity] = {
     val column = OrderDetail.column
     OrderDetail.findAllBy(sqls.eq(column.summaryId, summaryId)).map { d =>
-      OrderDetailEntity(d.summaryId, d.itemId, d.number, d.discountRate, d.price)
+      OrderDetailEntity(OrderSummaryId(d.summaryId), ItemId(d.itemId), d.number, d.discountRate, d.price)
     }
   }
 }

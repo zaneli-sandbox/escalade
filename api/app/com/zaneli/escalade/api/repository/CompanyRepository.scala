@@ -1,21 +1,21 @@
 package com.zaneli.escalade.api.repository
 
-import com.zaneli.escalade.api.entity.{CompanyEntity, HasId, HasVersion}
+import com.zaneli.escalade.api.entity.{CompanyEntity, CompanyId, HasId, HasVersion}
 import com.zaneli.escalade.api.persistence.Company
 import scalikejdbc.DBSession
 
-class CompanyRepository {
+class CompanyRepository extends InsertOrOptimisticLockUpdate[CompanyEntity, CompanyId] {
 
-  def save(entity: CompanyEntity)(implicit s: DBSession): Result[Long] = {
+  def save(entity: CompanyEntity)(implicit s: DBSession): Result[CompanyId] = {
     val column = Company.column
-    insertOrOptimisticLockUpdate(entity) {
-      Company.createWithNamedValues(column.name -> entity.name)
+    insertOrUpdate(entity) { e =>
+      CompanyId(Company.createWithNamedValues(column.name -> e.name))
     } { e =>
-      Company.updateByIdAndVersion(e.id, e.version).withNamedValues(column.name -> entity.name)
+      Company.updateByIdAndVersion(e.id.value, e.version).withNamedValues(column.name -> entity.name)
     }
   }
 
-  def selectById(id: Long)(implicit s: DBSession): Option[CompanyEntity with HasId[Long] with HasVersion] = {
-    Company.findById(id).map(c => CompanyEntity(c.id, c.name, c.lockVersion))
+  def selectById(id: CompanyId)(implicit s: DBSession): Option[CompanyEntity with HasId[CompanyId] with HasVersion] = {
+    Company.findById(id.value).map(c => CompanyEntity(CompanyId(c.id), c.name, c.lockVersion))
   }
 }
