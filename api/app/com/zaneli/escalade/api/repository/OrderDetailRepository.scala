@@ -2,22 +2,17 @@ package com.zaneli.escalade.api.repository
 
 import com.zaneli.escalade.api.entity.{ItemId, OrderDetailEntity, OrderSummaryId}
 import com.zaneli.escalade.api.persistence.OrderDetail
-import scalikejdbc._
+import com.zaneli.escalade.generator._
+import scalikejdbc.{DBSession, sqls}
 
 import scala.util.control.Exception
 
 class OrderDetailRepository {
 
   def save(entity: OrderDetailEntity)(implicit s: DBSession): Either[Throwable, Result[Unit]] = {
-    val column = OrderDetail.column
+    val nvs = autoNamedValues(entity, OrderDetail.column)
     Exception.nonFatalCatch.either {
-      OrderDetail.createWithNamedValues(
-        column.summaryId -> entity.summaryId,
-        column.itemId -> entity.itemId,
-        column.number -> entity.number,
-        column.discountRate -> entity.discountRate,
-        column.price -> entity.price
-      )
+      OrderDetail.createWithNamedValues(nvs: _*)
       InsertSuccess(())
     }
   }

@@ -2,27 +2,18 @@ package com.zaneli.escalade.api.repository
 
 import com.zaneli.escalade.api.entity._
 import com.zaneli.escalade.api.persistence.OrderSummary
+import com.zaneli.escalade.generator._
 import scalikejdbc.DBSession
 
 class OrderSummaryRepository extends InsertOrOptimisticLockUpdate[OrderSummaryEntity, OrderSummaryId] {
 
   def save(entity: OrderSummaryEntity)(implicit s: DBSession): Either[Throwable, Result[OrderSummaryId]] = {
-    val column = OrderSummary.column
+    val nvs = autoNamedValues(entity, OrderSummary.column, "details")
     insertOrUpdate(entity) { e =>
-      val id = OrderSummary.createWithNamedValues(
-        column.orderer -> e.orderer,
-        column.status -> e.status,
-        column.orderDate -> e.orderDate,
-        column.settledDate -> e.settledDate
-      )
+      val id = OrderSummary.createWithNamedValues(nvs: _*)
       OrderSummaryId(id)
     } { e =>
-      OrderSummary.updateByIdAndVersion(e.id.value, e.version).withNamedValues(
-        column.orderer -> entity.orderer,
-        column.status -> entity.status,
-        column.orderDate -> entity.orderDate,
-        column.settledDate -> entity.settledDate
-      )
+      OrderSummary.updateByIdAndVersion(e.id.value, e.version).withNamedValues(nvs: _*)
     }
   }
 

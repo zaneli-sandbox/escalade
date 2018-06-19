@@ -2,7 +2,7 @@ package com.zaneli.escalade.api.repository
 
 import com.zaneli.escalade.api.entity._
 import com.zaneli.escalade.api.persistence.Member
-import scalikejdbc._
+import scalikejdbc.{DBSession, sqls}
 
 class MemberRepository extends InsertOrOptimisticLockUpdate[MemberEntity, MemberId] {
 
@@ -15,8 +15,10 @@ class MemberRepository extends InsertOrOptimisticLockUpdate[MemberEntity, Member
       )
       MemberId(id)
     } { e =>
-      Member.updateByIdAndVersion(e.id.value, e.version)
-        .withNamedValues(column.name -> entity.name, column.companyId -> companyId)
+      Member.updateByIdAndVersion(e.id.value, e.version).withNamedValues(
+        column.name -> entity.name,
+        column.companyId -> companyId
+      )
     }
   }
 
