@@ -35,6 +35,7 @@ lazy val api = (project in file("api"))
       "org.skinny-framework" %% "skinny-orm" % "2.6.0",
       "com.h2database" % "h2" % "1.4.197" % Test,
       "org.scalikejdbc" %% "scalikejdbc-test" % "3.2.3" % Test,
-      specs2 % Test
+      specs2 % Test,
+      "org.scalamock" %% "scalamock-specs2-support" % "3.6.0" % Test
     )
   ).dependsOn(generator).enablePlugins(PlayScala)
