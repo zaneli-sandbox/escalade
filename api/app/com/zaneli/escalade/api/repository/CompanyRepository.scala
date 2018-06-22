@@ -16,7 +16,7 @@ class CompanyRepository extends InsertOrOptimisticLockUpdate[CompanyEntity, Comp
     }
   }
 
-  def selectById(id: CompanyId)(implicit s: DBSession): Option[CompanyEntity with HasId[CompanyId] with HasVersion] = {
+  def findById(id: CompanyId)(implicit s: DBSession): Option[CompanyEntity with HasId[CompanyId] with HasVersion] = {
     Company.findById(id.value).map(c => CompanyEntity(CompanyId(c.id), c.name, c.lockVersion))
   }
 }

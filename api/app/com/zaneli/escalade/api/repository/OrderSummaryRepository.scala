@@ -17,7 +17,7 @@ class OrderSummaryRepository extends InsertOrOptimisticLockUpdate[OrderSummaryEn
     }
   }
 
-  def selectById(id: OrderSummaryId)(implicit s: DBSession): Option[OrderSummaryEntity with HasId[OrderSummaryId] with HasVersion] = {
+  def findById(id: OrderSummaryId)(implicit s: DBSession): Option[OrderSummaryEntity with HasId[OrderSummaryId] with HasVersion] = {
     OrderSummary.joins(OrderSummary.detailsRef).findById(id.value).map { s =>
       val details = s.details.map { d =>
         OrderDetailEntity(OrderSummaryId(d.summaryId), ItemId(d.itemId), d.number, d.discountRate, d.price)

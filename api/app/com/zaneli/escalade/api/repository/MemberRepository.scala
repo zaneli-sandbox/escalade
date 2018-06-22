@@ -22,7 +22,7 @@ class MemberRepository extends InsertOrOptimisticLockUpdate[MemberEntity, Member
     }
   }
 
-  def selectById(id: MemberId)(implicit s: DBSession): Option[MemberEntity with HasId[MemberId] with HasVersion] = {
+  def findById(id: MemberId)(implicit s: DBSession): Option[MemberEntity with HasId[MemberId] with HasVersion] = {
     Member.includes(Member.companyRef).findById(id.value).flatMap { m =>
       m.company.map { c =>
         val company = CompanyEntity.apply(CompanyId(c.id), c.name, c.lockVersion)
@@ -31,7 +31,7 @@ class MemberRepository extends InsertOrOptimisticLockUpdate[MemberEntity, Member
     }
   }
 
-  def selectByCompanyId(companyId: CompanyId)(implicit s: DBSession): List[MemberEntity with HasId[MemberId] with HasVersion] = {
+  def findByCompanyId(companyId: CompanyId)(implicit s: DBSession): List[MemberEntity with HasId[MemberId] with HasVersion] = {
     val column = Member.column
     Member.includes(Member.companyRef).findAllBy(sqls.eq(column.companyId, companyId)).flatMap { m =>
       m.company.map { c =>

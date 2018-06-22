@@ -24,7 +24,7 @@ class OrderSummaryRepositorySpec extends Specification with DBSetup {
   "OrderSummaryRepository.selectBySummaryId" should {
     "存在するIDを指定" in new AutoRollbackWithFixture {
       val id = OrderSummaryId(1L)
-      repo.selectById(id) must beSome.which { s =>
+      repo.findById(id) must beSome.which { s =>
         s.id must_== id
         s.orderer must_== MemberId(1L)
         s.status must_== OrderStatus.Unsettled
@@ -36,7 +36,7 @@ class OrderSummaryRepositorySpec extends Specification with DBSetup {
       }
     }
     "存在しないIDを指定" in new AutoRollbackWithFixture {
-      repo.selectById(OrderSummaryId(-1L)) must beNone
+      repo.findById(OrderSummaryId(-1L)) must beNone
     }
   }
 
@@ -44,20 +44,18 @@ class OrderSummaryRepositorySpec extends Specification with DBSetup {
     "新規作成" in new AutoRollbackWithFixture {
       val now = LocalDateTime.now()
       val entity = OrderSummaryEntity(MemberId(1L), OrderStatus.Settled, now, now.some, Nil)
-      val result = repo.save(entity)
-      result must beRight.which {
-        case InsertSuccess(id) => repo.selectById(id) must beSome(entity)
+      repo.save(entity) must beRight.which {
+        case InsertSuccess(id) => repo.findById(id) must beSome(entity)
         case _ => ko
       }
     }
     "更新" in new AutoRollbackWithFixture {
       val now = LocalDateTime.now()
-      repo.selectById(OrderSummaryId(1L)) must beSome.which { s =>
+      repo.findById(OrderSummaryId(1L)) must beSome.which { s =>
         val entity = OrderSummaryEntity(s.id, MemberId(2L), OrderStatus.Settled, now, now.some, Nil, s.version)
-        val result = repo.save(entity)
-        result must beRight(UpdateSuccess(1))
+        repo.save(entity) must beRight(UpdateSuccess(1))
 
-        repo.selectById(entity.id) must beSome.which { u =>
+        repo.findById(entity.id) must beSome.which { u =>
           u.orderDate must_== entity.orderDate
           u.status must_== entity.status
           u.orderDate must_== entity.orderDate
@@ -67,12 +65,11 @@ class OrderSummaryRepositorySpec extends Specification with DBSetup {
     }
     "楽観ロックエラー" in new AutoRollbackWithFixture {
       val now = LocalDateTime.now()
-      repo.selectById(OrderSummaryId(1L)) must beSome.which { s =>
+      repo.findById(OrderSummaryId(1L)) must beSome.which { s =>
         val entity = OrderSummaryEntity(s.id, MemberId(2L), OrderStatus.Settled, now, now.some, Nil, s.version + 1)
-        val result = repo.save(entity)
-        result must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
+        repo.save(entity) must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
 
-        repo.selectById(entity.id) must beSome.which { u =>
+        repo.findById(entity.id) must beSome.which { u =>
           u.orderer must_== MemberId(1L)
           u.status must_== OrderStatus.Unsettled
           u.settledDate must beNone

@@ -20,13 +20,13 @@ class OrderDetailRepositorySpec extends Specification with DBSetup {
   "OrderDetailRepository.selectBySummaryId" should {
     "存在するSummaryIDを指定" in new AutoRollbackWithFixture {
       val id = OrderSummaryId(1L)
-      repo.selectBySummaryId(id).sortBy(_.itemId) must_== List(
+      repo.findBySummaryId(id).sortBy(_.itemId) must_== List(
         OrderDetailEntity(id, ItemId(1L), 10, Rate(10), Price(900)),
         OrderDetailEntity(id, ItemId(2L), 5, Rate(3), Price(727.5))
       )
     }
     "存在しないSummaryIDを指定" in new AutoRollbackWithFixture {
-      repo.selectBySummaryId(OrderSummaryId(-1L)).sortBy(_.itemId) must beEmpty
+      repo.findBySummaryId(OrderSummaryId(-1L)).sortBy(_.itemId) must beEmpty
     }
   }
 
@@ -34,13 +34,12 @@ class OrderDetailRepositorySpec extends Specification with DBSetup {
     "新規作成" in new AutoRollbackWithFixture {
       val id = OrderSummaryId(2L)
       val initial = OrderDetailEntity(id, ItemId(1L), 5, Rate(7), Price(465))
-      repo.selectBySummaryId(id).sortBy(_.itemId) must_== List(initial)
+      repo.findBySummaryId(id).sortBy(_.itemId) must_== List(initial)
 
       val additinal = OrderDetailEntity(id, ItemId(2L), 5, Rate(3), Price(727.5))
-      val result = repo.save(additinal)
-      result must beRight(InsertSuccess(()))
+      repo.save(additinal) must beRight(InsertSuccess(()))
 
-      repo.selectBySummaryId(id).sortBy(_.itemId) must_== List(initial, additinal)
+      repo.findBySummaryId(id).sortBy(_.itemId) must_== List(initial, additinal)
     }
     "ユニーク制約違反" in new AutoRollbackWithFixture {
       val id = OrderSummaryId(1L)
@@ -48,13 +47,12 @@ class OrderDetailRepositorySpec extends Specification with DBSetup {
         OrderDetailEntity(id, ItemId(1L), 10, Rate(10), Price(900)),
         OrderDetailEntity(id, ItemId(2L), 5, Rate(3), Price(727.5))
       )
-      repo.selectBySummaryId(id).sortBy(_.itemId) must_== initials
+      repo.findBySummaryId(id).sortBy(_.itemId) must_== initials
 
       val entity = OrderDetailEntity(id, ItemId(1L), 5, Rate(3), Price(727.5))
-      val result = repo.save(entity)
-      result must beLeft
+      repo.save(entity) must beLeft
 
-      repo.selectBySummaryId(id).sortBy(_.itemId) must_== initials
+      repo.findBySummaryId(id).sortBy(_.itemId) must_== initials
     }
   }
 }

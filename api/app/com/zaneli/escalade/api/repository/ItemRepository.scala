@@ -19,7 +19,7 @@ class ItemRepository extends InsertOrOptimisticLockUpdate[ItemEntity, ItemId] {
     }
   }
 
-  def selectById(id: ItemId)(implicit s: DBSession): Option[ItemEntity with HasId[ItemId] with HasVersion] = {
+  def findById(id: ItemId)(implicit s: DBSession): Option[ItemEntity with HasId[ItemId] with HasVersion] = {
     Item.findById(id.value).map(c => ItemEntity(ItemId(c.id), c.name, c.price, c.lockVersion))
   }
 

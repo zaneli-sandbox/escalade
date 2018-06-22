@@ -21,45 +21,42 @@ class CompanyRepositorySpec extends Specification with DBSetup {
   "CompanyRepository.selectById" should {
     "存在するIDを指定" in new AutoRollbackWithFixture {
       val id = CompanyId(1L)
-      repo.selectById(id) must beSome.which { c =>
+      repo.findById(id) must beSome.which { c =>
         c.id must_== id
         c.name must_== "test_company_1"
         c.version must_== 1L
       }
     }
     "存在しないIDを指定" in new AutoRollbackWithFixture {
-      repo.selectById(CompanyId(-1L)) must beNone
+      repo.findById(CompanyId(-1L)) must beNone
     }
   }
 
   "CompanyRepository.save()" should {
     "新規作成" in new AutoRollbackWithFixture {
       val entity = CompanyEntity("inserted_company")
-      val result = repo.save(entity)
-      result must beRight.which {
-        case InsertSuccess(id) => repo.selectById(id) must beSome(entity)
+      repo.save(entity) must beRight.which {
+        case InsertSuccess(id) => repo.findById(id) must beSome(entity)
         case _ => ko
       }
     }
     "更新" in new AutoRollbackWithFixture {
-      repo.selectById(CompanyId(1L)) must beSome.which { c =>
+      repo.findById(CompanyId(1L)) must beSome.which { c =>
         val entity = CompanyEntity(c.id, "updated_company", c.version)
-        val result = repo.save(entity)
-        result must beRight(UpdateSuccess(1))
+        repo.save(entity) must beRight(UpdateSuccess(1))
 
-        repo.selectById(entity.id) must beSome.which { u =>
+        repo.findById(entity.id) must beSome.which { u =>
           u.name must_== entity.name
           u.version must_== c.version + 1
         }
       }
     }
     "楽観ロックエラー" in new AutoRollbackWithFixture {
-      repo.selectById(CompanyId(1L)) must beSome.which { c =>
+      repo.findById(CompanyId(1L)) must beSome.which { c =>
         val entity = CompanyEntity(c.id, "updated_company", c.version + 1L)
-        val result = repo.save(entity)
-        result must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
+        repo.save(entity) must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
 
-        repo.selectById(entity.id) must beSome(CompanyEntity("test_company_1"))
+        repo.findById(entity.id) must beSome(CompanyEntity("test_company_1"))
       }
     }
   }

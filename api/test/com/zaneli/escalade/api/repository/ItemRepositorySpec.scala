@@ -21,7 +21,7 @@ class ItemRepositorySpec extends Specification with DBSetup {
   "ItemRepository.selectById" should {
     "存在するIDを指定" in new AutoRollbackWithFixture {
       val id = ItemId(1L)
-      repo.selectById(id) must beSome.which { i =>
+      repo.findById(id) must beSome.which { i =>
         i.id must_== id
         i.name must_== "test_item_1"
         i.price must_== Price(100)
@@ -29,29 +29,27 @@ class ItemRepositorySpec extends Specification with DBSetup {
       }
     }
     "存在しないIDを指定" in new AutoRollbackWithFixture {
-      repo.selectById(ItemId(-1L)) must beNone
+      repo.findById(ItemId(-1L)) must beNone
     }
     "論理削除されたIDを指定" in new AutoRollbackWithFixture {
-      repo.selectById(ItemId(3L)) must beNone
+      repo.findById(ItemId(3L)) must beNone
     }
   }
 
   "ItemRepository.save()" should {
     "新規作成" in new AutoRollbackWithFixture {
       val entity = ItemEntity("inserted_item", Price(10))
-      val result = repo.save(entity)
-      result must beRight.which {
-        case InsertSuccess(id) => repo.selectById(id) must beSome(entity)
+      repo.save(entity) must beRight.which {
+        case InsertSuccess(id) => repo.findById(id) must beSome(entity)
         case _ => ko
       }
     }
     "更新" in new AutoRollbackWithFixture {
-      repo.selectById(ItemId(1L)) must beSome.which { c =>
+      repo.findById(ItemId(1L)) must beSome.which { c =>
         val entity = ItemEntity(c.id, "updated_item", c.price.map(_ + 1), c.version)
-        val result = repo.save(entity)
-        result must beRight(UpdateSuccess(1))
+        repo.save(entity) must beRight(UpdateSuccess(1))
 
-        repo.selectById(entity.id) must beSome.which { u =>
+        repo.findById(entity.id) must beSome.which { u =>
           u.name must_== entity.name
           u.price must_== Price(101)
           u.version must_== c.version + 1
@@ -59,12 +57,11 @@ class ItemRepositorySpec extends Specification with DBSetup {
       }
     }
     "楽観ロックエラー" in new AutoRollbackWithFixture {
-      repo.selectById(ItemId(1L)) must beSome.which { c =>
+      repo.findById(ItemId(1L)) must beSome.which { c =>
         val entity = ItemEntity(c.id, "updated_item", c.price.map(_ + 1), c.version + 1L)
-        val result = repo.save(entity)
-        result must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
+        repo.save(entity) must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
 
-        repo.selectById(entity.id) must beSome(ItemEntity("test_item_1", Price(100)))
+        repo.findById(entity.id) must beSome(ItemEntity("test_item_1", Price(100)))
       }
     }
   }
@@ -74,7 +71,7 @@ class ItemRepositorySpec extends Specification with DBSetup {
       val id = ItemId(1L)
       val version = 1L
       repo.deleteByIdAndVersion(id, version) must beRight(UpdateSuccess(1))
-      repo.selectById(id) must beNone
+      repo.findById(id) must beNone
       findIgnoreDeleteFlag(id) must beSome.which { case (item, deleted) =>
         item.id must_== id
         item.version must_== version + 1L
@@ -84,16 +81,16 @@ class ItemRepositorySpec extends Specification with DBSetup {
     "存在しないIDを指定" in new AutoRollbackWithFixture {
       val id = ItemId(-1L)
       val version = 1L
-      repo.selectById(id) must beNone
+      repo.findById(id) must beNone
       repo.deleteByIdAndVersion(id, version) must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
-      repo.selectById(id) must beNone
+      repo.findById(id) must beNone
     }
     "楽観ロックエラー" in new AutoRollbackWithFixture {
       val id = ItemId(1L)
       val version = 2L
-      repo.selectById(id) must beSome
+      repo.findById(id) must beSome
       repo.deleteByIdAndVersion(id, version) must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
-      repo.selectById(id) must beSome
+      repo.findById(id) must beSome
     }
   }
 

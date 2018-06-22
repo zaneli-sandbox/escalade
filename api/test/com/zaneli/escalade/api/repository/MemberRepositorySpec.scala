@@ -21,60 +21,57 @@ class MemberRepositorySpec extends Specification with DBSetup {
   "MemberRepository.selectById" should {
     "存在するIDを指定" in new AutoRollbackWithFixture {
       val id = MemberId(1L)
-      repo.selectById(id) must beSome.which { c =>
+      repo.findById(id) must beSome.which { c =>
         c.id must_== id
         c.name must_== "test_member_1_1"
         c.version must_== 1L
       }
     }
     "存在しないIDを指定" in new AutoRollbackWithFixture {
-      repo.selectById(MemberId(-1L)) must beNone
+      repo.findById(MemberId(-1L)) must beNone
     }
   }
 
   "MemberRepository.selectByCompanyId" should {
     "存在するCompanyIDを指定" in new AutoRollbackWithFixture {
-      repo.selectByCompanyId(CompanyId(1L)).sortBy(_.id) must_== List(
+      repo.findByCompanyId(CompanyId(1L)).sortBy(_.id) must_== List(
         MemberEntity("test_member_1_1", CompanyEntity("test_company_1")),
         MemberEntity("test_member_1_2", CompanyEntity("test_company_1"))
       )
     }
     "存在しないCompanyIDを指定" in new AutoRollbackWithFixture {
-      repo.selectByCompanyId(CompanyId(-1L)).sortBy(_.id) must beEmpty
+      repo.findByCompanyId(CompanyId(-1L)).sortBy(_.id) must beEmpty
     }
     "存在するが紐づくMemberが存在しないCompanyIDを指定" in new AutoRollbackWithFixture {
-      repo.selectByCompanyId(CompanyId(2L)).sortBy(_.id) must beEmpty
+      repo.findByCompanyId(CompanyId(2L)).sortBy(_.id) must beEmpty
     }
   }
 
   "MemberRepository.save()" should {
     "新規作成" in new AutoRollbackWithFixture {
       val entity = MemberEntity("inserted_member", CompanyEntity("test_company_1"))
-      val result = repo.save(entity, CompanyId(1L))
-      result must beRight.which {
-        case InsertSuccess(id) => repo.selectById(id) must beSome(entity)
+      repo.save(entity, CompanyId(1L)) must beRight.which {
+        case InsertSuccess(id) => repo.findById(id) must beSome(entity)
         case _ => ko
       }
     }
     "更新" in new AutoRollbackWithFixture {
-      repo.selectById(MemberId(1L)) must beSome.which { m =>
+      repo.findById(MemberId(1L)) must beSome.which { m =>
         val entity = MemberEntity(m.id, "updated_member", CompanyEntity("test_company_1"), m.version)
-        val result = repo.save(entity, CompanyId(1L))
-        result must beRight(UpdateSuccess(1))
+        repo.save(entity, CompanyId(1L)) must beRight(UpdateSuccess(1))
 
-        repo.selectById(entity.id) must beSome.which { u =>
+        repo.findById(entity.id) must beSome.which { u =>
           u.name must_== entity.name
           u.version must_== m.version + 1
         }
       }
     }
     "楽観ロックエラー" in new AutoRollbackWithFixture {
-      repo.selectById(MemberId(1L)) must beSome.which { m =>
+      repo.findById(MemberId(1L)) must beSome.which { m =>
         val entity = MemberEntity(m.id, "updated_member", CompanyEntity("test_company_1"), m.version + 1)
-        val result = repo.save(entity, CompanyId(1L))
-        result must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
+        repo.save(entity, CompanyId(1L)) must beLeft.which(_ must beAnInstanceOf[OptimisticLockException])
 
-        repo.selectById(entity.id) must beSome(MemberEntity("test_member_1_1", CompanyEntity("test_company_1")))
+        repo.findById(entity.id) must beSome(MemberEntity("test_member_1_1", CompanyEntity("test_company_1")))
       }
     }
   }

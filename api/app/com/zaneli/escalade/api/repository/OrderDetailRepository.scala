@@ -18,7 +18,7 @@ class OrderDetailRepository {
     }
   }
 
-  def selectBySummaryId(summaryId: OrderSummaryId)(implicit s: DBSession): List[OrderDetailEntity] = {
+  def findBySummaryId(summaryId: OrderSummaryId)(implicit s: DBSession): List[OrderDetailEntity] = {
     val column = OrderDetail.column
     OrderDetail.findAllBy(sqls.eq(column.summaryId, summaryId)).map { d =>
       OrderDetailEntity(OrderSummaryId(d.summaryId), ItemId(d.itemId), d.number, d.discountRate, d.price)
