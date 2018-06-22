@@ -9,7 +9,7 @@ class OrderSummaryRepository extends InsertOrOptimisticLockUpdate[OrderSummaryEn
 
   def save(entity: OrderSummaryEntity)(implicit s: DBSession): Either[Throwable, Result[OrderSummaryId]] = {
     val nvs = autoNamedValues(entity, OrderSummary.column, "details")
-    insertOrUpdate(entity) { e =>
+    insertOrUpdate(entity) { _ =>
       val id = OrderSummary.createWithNamedValues(nvs: _*)
       OrderSummaryId(id)
     } { e =>

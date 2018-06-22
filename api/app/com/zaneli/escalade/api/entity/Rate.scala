@@ -8,7 +8,7 @@ sealed abstract case class Rate(private[entity] val percentage: BigDecimal) {
   lazy val reciprocal: Rate = Rate(100 - percentage)
 
   def *(price: Price): Price = {
-    Price(price.value * (percentage / 100))
+    price.map(_ * (percentage / 100))
   }
 }
 

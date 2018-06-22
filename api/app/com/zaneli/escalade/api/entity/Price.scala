@@ -2,11 +2,15 @@ package com.zaneli.escalade.api.entity
 
 import scalikejdbc.Binders
 
-sealed case class Price(value: BigDecimal) {
+sealed case class Price(private val value: BigDecimal) {
   override def toString: String = f"$value%2.2f"
 
   def *(rate: Rate): Price = {
-    Price(value * (rate.percentage / 100))
+    map(_  * (rate.percentage / 100))
+  }
+
+  def map(f: BigDecimal => BigDecimal): Price = {
+    Price(f(value))
   }
 }
 

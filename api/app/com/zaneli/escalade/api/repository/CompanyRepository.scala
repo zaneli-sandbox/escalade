@@ -9,7 +9,7 @@ class CompanyRepository extends InsertOrOptimisticLockUpdate[CompanyEntity, Comp
 
   def save(entity: CompanyEntity)(implicit s: DBSession): Either[Throwable, Result[CompanyId]] = {
     val nvs = autoNamedValues(entity, Company.column)
-    insertOrUpdate(entity) { e =>
+    insertOrUpdate(entity) { _ =>
       CompanyId(Company.createWithNamedValues(nvs: _*))
     } { e =>
       Company.updateByIdAndVersion(e.id.value, e.version).withNamedValues(nvs: _*)

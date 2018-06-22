@@ -19,6 +19,7 @@ CREATE TABLE `items` (
   `name` varchar(100) NOT NULL,
   `price` int(11) NOT NULL,
   `lock_version` int(11) NOT NULL DEFAULT 1,
+  `is_deleted` boolean NOT NULL DEFAULT false,
   PRIMARY KEY(`id`)
 );
 

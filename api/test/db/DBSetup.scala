@@ -32,9 +32,9 @@ object DBSetup {
        """.stripMargin.update.apply()
     sql"""
          |INSERT INTO items
-         |  (`id`, `name`, `price`)
+         |  (`id`, `name`, `price`, `is_deleted`)
          |VALUES
-         |  (1, 'test_item_1', 100), (2, 'test_item_2', 150)
+         |  (1, 'test_item_1', 100, false), (2, 'test_item_2', 150, false), (3, 'test_item_3', 100, true)
        """.stripMargin.update.apply()
     sql"""
          |INSERT INTO order_summaries
