@@ -1,7 +1,8 @@
 package com.zaneli.escalade.api.service
 
 import com.zaneli.escalade.api.entity.{CompanyId, HasId, MemberEntity}
-import com.zaneli.escalade.api.repository.{CompanyRepository, InsertSuccess, MemberRepository, UpdateSuccess}
+import com.zaneli.escalade.api.repository.Result.{InsertSuccess, UpdateSuccess}
+import com.zaneli.escalade.api.repository.{CompanyRepository, MemberRepository}
 import scalikejdbc.DB
 
 class CompanyMemberService(cr: CompanyRepository, mr: MemberRepository) {

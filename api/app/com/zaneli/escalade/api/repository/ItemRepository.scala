@@ -2,6 +2,7 @@ package com.zaneli.escalade.api.repository
 
 import com.zaneli.escalade.api.entity.{HasId, HasVersion, ItemEntity, ItemId}
 import com.zaneli.escalade.api.persistence.Item
+import com.zaneli.escalade.api.repository.Result.UpdateSuccess
 import com.zaneli.escalade.generator._
 import scalikejdbc.DBSession
 

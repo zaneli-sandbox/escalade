@@ -2,6 +2,7 @@ package com.zaneli.escalade.api.repository
 
 import com.zaneli.escalade.api.entity.{ItemId, OrderDetailEntity, OrderSummaryId}
 import com.zaneli.escalade.api.persistence.OrderDetail
+import com.zaneli.escalade.api.repository.Result.InsertSuccess
 import com.zaneli.escalade.generator._
 import scalikejdbc.{DBSession, sqls}
 

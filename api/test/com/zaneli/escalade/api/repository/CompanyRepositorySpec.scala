@@ -1,6 +1,7 @@
 package com.zaneli.escalade.api.repository
 
 import com.zaneli.escalade.api.entity.{CompanyEntity, CompanyId}
+import com.zaneli.escalade.api.repository.Result.{InsertSuccess, UpdateSuccess}
 import db.DBSetup
 import org.specs2.mutable.{After, Specification}
 import scalikejdbc._

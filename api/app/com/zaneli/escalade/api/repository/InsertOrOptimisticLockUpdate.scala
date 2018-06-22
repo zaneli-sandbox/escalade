@@ -1,6 +1,7 @@
 package com.zaneli.escalade.api.repository
 
 import com.zaneli.escalade.api.entity.{EntityWithPK, HasId, HasVersion}
+import com.zaneli.escalade.api.repository.Result.{InsertSuccess, UpdateSuccess}
 
 import scala.util.control.Exception
 
