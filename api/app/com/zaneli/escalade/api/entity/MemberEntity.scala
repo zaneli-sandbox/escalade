@@ -1,9 +1,8 @@
 package com.zaneli.escalade.api.entity
 
-sealed abstract case class MemberEntity(name: String, company: CompanyEntity) extends EntityWithPK[MemberId]
+case class MemberEntity(name: String, company: CompanyEntity) extends EntityWithPK[MemberId]
 
 object MemberEntity {
-  def apply(name: String, company: CompanyEntity): MemberEntity = new MemberEntity(name, company){}
 
   def apply(
     _id: MemberId,

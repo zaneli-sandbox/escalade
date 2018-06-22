@@ -2,7 +2,7 @@ package com.zaneli.escalade.api.entity
 
 import java.time.LocalDateTime
 
-sealed abstract case class OrderSummaryEntity(
+case class OrderSummaryEntity(
   orderer: MemberId,
   status: OrderStatus,
   orderDate: LocalDateTime,
@@ -11,15 +11,6 @@ sealed abstract case class OrderSummaryEntity(
 ) extends EntityWithPK[OrderSummaryId]
 
 object OrderSummaryEntity {
-  def apply(
-    orderer: MemberId,
-    status: OrderStatus,
-    orderDate: LocalDateTime,
-    settledDate: Option[LocalDateTime],
-    details: Seq[OrderDetailEntity]
-  ): OrderSummaryEntity = new OrderSummaryEntity(
-    orderer, status, orderDate, settledDate, details
-  ){}
 
   def apply(
     _id: OrderSummaryId,
