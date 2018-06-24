@@ -1,6 +1,9 @@
 package com.zaneli.escalade.api.entity
 
+import io.circe.{Decoder, Encoder}
 import scalikejdbc.Binders
+
+import scala.util.Try
 
 sealed abstract class OrderStatus(private val value: String)
 
@@ -14,4 +17,11 @@ object OrderStatus {
     v => OrderStatus.values.find(_.value == v).getOrElse(throw new IllegalArgumentException(v)),
     _.value
   )
+
+  implicit val encode: Encoder[OrderStatus] = Encoder[String].contramap(_.value)
+  implicit val decode: Decoder[OrderStatus] = Decoder[String].emapTry { v =>
+    Try {
+      OrderStatus.values.find(_.value == v).getOrElse(throw new IllegalArgumentException(v))
+    }
+  }
 }

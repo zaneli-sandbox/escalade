@@ -1,18 +1,37 @@
 package com.zaneli.escalade.api.service
 
-import com.zaneli.escalade.api.entity.{CompanyId, HasId, MemberEntity}
-import com.zaneli.escalade.api.repository.Result.{InsertSuccess, UpdateSuccess}
+import com.zaneli.escalade.api.entity._
+import com.zaneli.escalade.api.repository.Result
 import com.zaneli.escalade.api.repository.{CompanyRepository, MemberRepository}
+import javax.inject.Inject
 import scalikejdbc.DB
 
-class CompanyMemberService(cr: CompanyRepository, mr: MemberRepository) {
+class CompanyMemberService @Inject() (cr: CompanyRepository, mr: MemberRepository) {
+
+  def findCompanyById(id: CompanyId): Option[CompanyEntity with HasId[CompanyId] with HasVersion] = {
+    DB.readOnly { implicit s =>
+      cr.findById(id)
+    }
+  }
+
+  def findCompanies(): List[CompanyEntity with HasId[CompanyId] with HasVersion] = {
+    DB.readOnly { implicit s =>
+      cr.findAll()
+    }
+  }
+
+  def save(company: CompanyEntity): Either[Throwable, Result[CompanyId]] = {
+    DB.localTx { implicit s =>
+      cr.save(company)
+    }
+  }
 
   def save(member: MemberEntity): Either[Throwable, Unit] = {
     DB.localTx { implicit s =>
       cr.save(member.company).flatMap {
-        case InsertSuccess(id) =>
+        case Result.InsertSuccess(id) =>
           mr.save(member, id)
-        case UpdateSuccess(_) =>
+        case Result.UpdateSuccess(_) =>
           member.company match {
             case c: HasId[CompanyId] =>
               mr.save(member, c.id)

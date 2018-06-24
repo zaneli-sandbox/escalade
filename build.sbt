@@ -32,7 +32,10 @@ lazy val api = (project in file("api"))
   .settings(
     libraryDependencies ++= Seq(
       guice,
+      "mysql" % "mysql-connector-java" % "8.0.11",
       "org.skinny-framework" %% "skinny-orm" % "2.6.0",
+      "org.scalikejdbc" %% "scalikejdbc-play-initializer" % "2.6.0-scalikejdbc-3.2",
+      "com.dripower" %% "play-circe" % "2609.1",
       "com.h2database" % "h2" % "1.4.197" % Test,
       "org.scalikejdbc" %% "scalikejdbc-test" % "3.2.3" % Test,
       specs2 % Test,

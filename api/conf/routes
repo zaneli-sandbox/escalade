@@ -1,3 +1,6 @@
-GET     /                           controllers.RootController.index
+GET    /company       controllers.CompanyController.list
+GET    /company/:id   controllers.CompanyController.get(id: Long)
+PUT    /company       controllers.CompanyController.create
+POST   /company/:id   controllers.CompanyController.edit(id: Long)
 
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET    /assets/*file  controllers.Assets.versioned(path="/public", file: Asset)
