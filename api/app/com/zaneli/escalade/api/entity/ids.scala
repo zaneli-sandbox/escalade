@@ -1,6 +1,6 @@
 package com.zaneli.escalade.api.entity
 
-import io.circe.{Decoder, Encoder}
+import io.circe.{ Decoder, Encoder }
 import scalikejdbc.Binders
 
 case class CompanyId(value: Long)

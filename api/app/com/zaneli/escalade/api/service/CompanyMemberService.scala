@@ -2,7 +2,7 @@ package com.zaneli.escalade.api.service
 
 import com.zaneli.escalade.api.entity._
 import com.zaneli.escalade.api.repository.Result
-import com.zaneli.escalade.api.repository.{CompanyRepository, MemberRepository}
+import com.zaneli.escalade.api.repository.{ CompanyRepository, MemberRepository }
 import javax.inject.Inject
 import scalikejdbc.DB
 

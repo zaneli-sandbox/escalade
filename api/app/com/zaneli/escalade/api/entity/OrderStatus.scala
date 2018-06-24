@@ -1,6 +1,6 @@
 package com.zaneli.escalade.api.entity
 
-import io.circe.{Decoder, Encoder}
+import io.circe.{ Decoder, Encoder }
 import scalikejdbc.Binders
 
 import scala.util.Try
@@ -15,8 +15,7 @@ object OrderStatus {
 
   implicit val binders: Binders[OrderStatus] = Binders.string.xmap(
     v => OrderStatus.values.find(_.value == v).getOrElse(throw new IllegalArgumentException(v)),
-    _.value
-  )
+    _.value)
 
   implicit val encode: Encoder[OrderStatus] = Encoder[String].contramap(_.value)
   implicit val decode: Decoder[OrderStatus] = Decoder[String].emapTry { v =>

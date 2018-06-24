@@ -8,8 +8,7 @@ object MemberEntity {
     _id: MemberId,
     name: String,
     company: CompanyEntity,
-    _version: Long
-  ): MemberEntity with HasId[MemberId] with HasVersion =
+    _version: Long): MemberEntity with HasId[MemberId] with HasVersion =
     new MemberEntity(name, company) with HasId[MemberId] with HasVersion {
       override lazy val id: MemberId = _id
       override lazy val version: Long = _version

@@ -3,9 +3,9 @@ package com.zaneli.escalade.api.repository
 import java.time.LocalDateTime
 
 import com.zaneli.escalade.api.entity._
-import com.zaneli.escalade.api.repository.Result.{InsertSuccess, UpdateSuccess}
+import com.zaneli.escalade.api.repository.Result.{ InsertSuccess, UpdateSuccess }
 import db.DBSetup
-import org.specs2.mutable.{After, Specification}
+import org.specs2.mutable.{ After, Specification }
 import scalaz.syntax.std.option._
 import scalikejdbc._
 import scalikejdbc.specs2.mutable.AutoRollback
@@ -31,8 +31,7 @@ class OrderSummaryRepositorySpec extends Specification with DBSetup {
         s.settledDate must beNone
         s.details.sortBy(_.itemId) must_== Seq(
           OrderDetailEntity(id, ItemId(1L), 10, Rate(10), Price(900)),
-          OrderDetailEntity(id, ItemId(2L), 5, Rate(3), Price(727.5))
-        )
+          OrderDetailEntity(id, ItemId(2L), 5, Rate(3), Price(727.5)))
       }
     }
     "存在しないIDを指定" in new AutoRollbackWithFixture {

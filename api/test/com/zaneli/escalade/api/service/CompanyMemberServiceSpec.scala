@@ -1,8 +1,8 @@
 package com.zaneli.escalade.api.service
 
-import com.zaneli.escalade.api.entity.{CompanyEntity, CompanyId, MemberEntity, MemberId}
-import com.zaneli.escalade.api.repository.Result.{InsertSuccess, UpdateSuccess}
-import com.zaneli.escalade.api.repository.{CompanyRepository, MemberRepository}
+import com.zaneli.escalade.api.entity.{ CompanyEntity, CompanyId, MemberEntity, MemberId }
+import com.zaneli.escalade.api.repository.Result.{ InsertSuccess, UpdateSuccess }
+import com.zaneli.escalade.api.repository.{ CompanyRepository, MemberRepository }
 import db.DBSetup
 import org.scalamock.specs2.MockContext
 import org.specs2.mutable.Specification

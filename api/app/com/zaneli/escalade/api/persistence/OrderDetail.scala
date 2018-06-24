@@ -1,16 +1,15 @@
 package com.zaneli.escalade.api.persistence
 
-import com.zaneli.escalade.api.entity.{Price, Rate}
-import scalikejdbc.{WrappedResultSet, autoConstruct}
-import skinny.orm.{Alias, SkinnyNoIdCRUDMapper}
+import com.zaneli.escalade.api.entity.{ Price, Rate }
+import scalikejdbc.{ WrappedResultSet, autoConstruct }
+import skinny.orm.{ Alias, SkinnyNoIdCRUDMapper }
 
 case class OrderDetail(
   summaryId: Long,
   itemId: Long,
   number: Int,
   discountRate: Rate,
-  price: Price
-)
+  price: Price)
 
 object OrderDetail extends SkinnyNoIdCRUDMapper[OrderDetail] {
 

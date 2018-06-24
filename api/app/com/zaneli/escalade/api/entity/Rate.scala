@@ -14,7 +14,7 @@ sealed abstract case class Rate(private[entity] val percentage: BigDecimal) {
 
 object Rate {
   def apply(percentage: BigDecimal): Rate = {
-    new Rate(percentage.setScale(2, BigDecimal.RoundingMode.HALF_UP)){}
+    new Rate(percentage.setScale(2, BigDecimal.RoundingMode.HALF_UP)) {}
   }
 
   implicit val binders: Binders[Rate] = Binders.bigDecimal.xmap(v => apply(v), _.percentage)

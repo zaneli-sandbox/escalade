@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 import com.zaneli.escalade.api.entity.OrderStatus
 import scalikejdbc._
-import skinny.orm.{Alias, SkinnyCRUDMapper}
+import skinny.orm.{ Alias, SkinnyCRUDMapper }
 import skinny.orm.feature.OptimisticLockWithVersionFeature
 import skinny.orm.feature.associations.HasManyAssociation
 
@@ -15,8 +15,7 @@ case class OrderSummary(
   orderDate: LocalDateTime,
   settledDate: Option[LocalDateTime],
   lockVersion: Long,
-  details: Seq[OrderDetail] = Nil
-)
+  details: Seq[OrderDetail] = Nil)
 
 object OrderSummary extends SkinnyCRUDMapper[OrderSummary] with OptimisticLockWithVersionFeature[OrderSummary] {
 
@@ -30,6 +29,5 @@ object OrderSummary extends SkinnyCRUDMapper[OrderSummary] with OptimisticLockWi
     many = OrderDetail -> OrderDetail.defaultAlias,
     fk = "summaryId",
     on = (s, d) => sqls.eq(s.id, d.summaryId),
-    merge = (summary, details) => summary.copy(details = details)
-  )
+    merge = (summary, details) => summary.copy(details = details))
 }

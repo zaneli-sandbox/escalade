@@ -1,14 +1,13 @@
 package com.zaneli.escalade.api.persistence
 
-import scalikejdbc.{WrappedResultSet, autoConstruct}
-import skinny.orm.{Alias, SkinnyCRUDMapper}
+import scalikejdbc.{ WrappedResultSet, autoConstruct }
+import skinny.orm.{ Alias, SkinnyCRUDMapper }
 import skinny.orm.feature.OptimisticLockWithVersionFeature
 
 case class Company(
   id: Long,
   name: String,
-  lockVersion: Long
-)
+  lockVersion: Long)
 
 object Company extends SkinnyCRUDMapper[Company] with OptimisticLockWithVersionFeature[Company] {
 

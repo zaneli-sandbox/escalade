@@ -1,7 +1,7 @@
 package db
 
 import scalikejdbc._
-import scalikejdbc.config.DBs
+import scalikejdbc.config.DBsWithEnv
 
 import scala.io.Source
 
@@ -14,7 +14,7 @@ object DBSetup {
 
   def initialize(): Unit = initialized.synchronized {
     if (!initialized) {
-      DBs.setupAll()
+      DBsWithEnv("test").setupAll()
       val ddl = Source.fromFile("../rdb/ddl.sql").getLines().mkString
       DB.autoCommit { implicit s =>
         SQL(ddl).executeUpdate().apply()

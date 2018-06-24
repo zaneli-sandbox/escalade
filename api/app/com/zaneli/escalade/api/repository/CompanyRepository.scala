@@ -1,6 +1,6 @@
 package com.zaneli.escalade.api.repository
 
-import com.zaneli.escalade.api.entity.{CompanyEntity, CompanyId, HasId, HasVersion}
+import com.zaneli.escalade.api.entity.{ CompanyEntity, CompanyId, HasId, HasVersion }
 import com.zaneli.escalade.api.persistence.Company
 import com.zaneli.escalade.generator._
 import scalikejdbc.DBSession

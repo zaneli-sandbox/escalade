@@ -42,3 +42,5 @@ lazy val api = (project in file("api"))
       "org.scalamock" %% "scalamock-specs2-support" % "3.6.0" % Test
     )
   ).dependsOn(generator).enablePlugins(PlayScala)
+
+import scalariform.formatter.preferences._

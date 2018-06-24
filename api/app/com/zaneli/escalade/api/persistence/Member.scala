@@ -1,7 +1,7 @@
 package com.zaneli.escalade.api.persistence
 
-import scalikejdbc.{WrappedResultSet, autoConstruct}
-import skinny.orm.{Alias, SkinnyCRUDMapper}
+import scalikejdbc.{ WrappedResultSet, autoConstruct }
+import skinny.orm.{ Alias, SkinnyCRUDMapper }
 import skinny.orm.feature.OptimisticLockWithVersionFeature
 import skinny.orm.feature.associations.BelongsToAssociation
 
@@ -10,8 +10,7 @@ case class Member(
   name: String,
   companyId: Long,
   lockVersion: Long,
-  company: Option[Company] = None
-)
+  company: Option[Company] = None)
 
 object Member extends SkinnyCRUDMapper[Member] with OptimisticLockWithVersionFeature[Member] {
 
@@ -24,6 +23,6 @@ object Member extends SkinnyCRUDMapper[Member] with OptimisticLockWithVersionFea
   lazy val companyRef: BelongsToAssociation[Member] =
     belongsTo[Company](Company, (m, c) => m.copy(company = c))
       .includes[Company]((es, cs) => es.map { e =>
-      cs.find(c => e.companyId == c.id).map(v => e.copy(company = Some(v))).getOrElse(e)
-    })
+        cs.find(c => e.companyId == c.id).map(v => e.copy(company = Some(v))).getOrElse(e)
+      })
 }

@@ -1,9 +1,9 @@
 package com.zaneli.escalade.api.repository
 
-import com.zaneli.escalade.api.entity.{CompanyEntity, CompanyId, MemberEntity, MemberId}
-import com.zaneli.escalade.api.repository.Result.{InsertSuccess, UpdateSuccess}
+import com.zaneli.escalade.api.entity.{ CompanyEntity, CompanyId, MemberEntity, MemberId }
+import com.zaneli.escalade.api.repository.Result.{ InsertSuccess, UpdateSuccess }
 import db.DBSetup
-import org.specs2.mutable.{After, Specification}
+import org.specs2.mutable.{ After, Specification }
 import scalikejdbc._
 import scalikejdbc.specs2.mutable.AutoRollback
 import skinny.orm.exception.OptimisticLockException
@@ -36,8 +36,7 @@ class MemberRepositorySpec extends Specification with DBSetup {
     "存在するCompanyIDを指定" in new AutoRollbackWithFixture {
       repo.findByCompanyId(CompanyId(1L)).sortBy(_.id) must_== List(
         MemberEntity("test_member_1_1", CompanyEntity("test_company_1")),
-        MemberEntity("test_member_1_2", CompanyEntity("test_company_1"))
-      )
+        MemberEntity("test_member_1_2", CompanyEntity("test_company_1")))
     }
     "存在しないCompanyIDを指定" in new AutoRollbackWithFixture {
       repo.findByCompanyId(CompanyId(-1L)).sortBy(_.id) must beEmpty

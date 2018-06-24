@@ -7,8 +7,7 @@ case class OrderSummaryEntity(
   status: OrderStatus,
   orderDate: LocalDateTime,
   settledDate: Option[LocalDateTime],
-  details: Seq[OrderDetailEntity]
-) extends EntityWithPK[OrderSummaryId]
+  details: Seq[OrderDetailEntity]) extends EntityWithPK[OrderSummaryId]
 
 object OrderSummaryEntity {
 
@@ -19,10 +18,8 @@ object OrderSummaryEntity {
     orderDate: LocalDateTime,
     settledDate: Option[LocalDateTime],
     details: Seq[OrderDetailEntity],
-    _version: Long
-  ): OrderSummaryEntity with HasId[OrderSummaryId] with HasVersion = new OrderSummaryEntity(
-    orderer, status, orderDate, settledDate, details
-  ) with HasId[OrderSummaryId] with HasVersion {
+    _version: Long): OrderSummaryEntity with HasId[OrderSummaryId] with HasVersion = new OrderSummaryEntity(
+    orderer, status, orderDate, settledDate, details) with HasId[OrderSummaryId] with HasVersion {
     override lazy val id: OrderSummaryId = _id
     override lazy val version: Long = _version
   }

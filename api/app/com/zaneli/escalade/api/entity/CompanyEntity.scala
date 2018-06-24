@@ -1,6 +1,6 @@
 package com.zaneli.escalade.api.entity
 
-import io.circe.{Decoder, Encoder}
+import io.circe.{ Decoder, Encoder }
 import io.circe.generic.semiauto.deriveDecoder
 
 case class CompanyEntity(name: String) extends EntityWithPK[CompanyId]
@@ -15,8 +15,7 @@ object CompanyEntity {
 
   implicit val encodeWith: Encoder[CompanyEntity with HasId[CompanyId] with HasVersion] =
     Encoder.forProduct3("id", "name", "version")(u =>
-      (u.id, u.name, u.version)
-    )
+      (u.id, u.name, u.version))
   implicit val decodeWith: Decoder[CompanyEntity with HasId[CompanyId] with HasVersion] =
     Decoder.forProduct3("id", "name", "version")(CompanyEntity.apply)
 

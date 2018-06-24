@@ -1,9 +1,9 @@
 package com.zaneli.escalade.api.repository
 
 import com.zaneli.escalade.api.entity._
-import com.zaneli.escalade.api.repository.Result.{InsertSuccess, UpdateSuccess}
+import com.zaneli.escalade.api.repository.Result.{ InsertSuccess, UpdateSuccess }
 import db.DBSetup
-import org.specs2.mutable.{After, Specification}
+import org.specs2.mutable.{ After, Specification }
 import scalikejdbc._
 import scalikejdbc.specs2.mutable.AutoRollback
 import skinny.orm.exception.OptimisticLockException
@@ -72,10 +72,11 @@ class ItemRepositorySpec extends Specification with DBSetup {
       val version = 1L
       repo.deleteByIdAndVersion(id, version) must beRight(UpdateSuccess(1))
       repo.findById(id) must beNone
-      findIgnoreDeleteFlag(id) must beSome.which { case (item, deleted) =>
-        item.id must_== id
-        item.version must_== version + 1L
-        deleted must beTrue
+      findIgnoreDeleteFlag(id) must beSome.which {
+        case (item, deleted) =>
+          item.id must_== id
+          item.version must_== version + 1L
+          deleted must beTrue
       }
     }
     "存在しないIDを指定" in new AutoRollbackWithFixture {
@@ -95,8 +96,7 @@ class ItemRepositorySpec extends Specification with DBSetup {
   }
 
   private[this] def findIgnoreDeleteFlag(
-    id: ItemId)(implicit s: DBSession
-  ): Option[(ItemEntity with HasId[ItemId] with HasVersion, Boolean)] = {
+    id: ItemId)(implicit s: DBSession): Option[(ItemEntity with HasId[ItemId] with HasVersion, Boolean)] = {
     sql"""
          |SELECT `id`, `name`, `price`, `lock_version`, `is_deleted` FROM `items` WHERE id = ${id.value}
        """.stripMargin.map { rs =>
@@ -104,8 +104,7 @@ class ItemRepositorySpec extends Specification with DBSetup {
         rs.get("id"),
         rs.get("name"),
         rs.get("price"),
-        rs.get("lock_version")
-      )
+        rs.get("lock_version"))
       val isDeleted = rs.boolean("is_deleted")
       (item, isDeleted)
     }.single.apply()

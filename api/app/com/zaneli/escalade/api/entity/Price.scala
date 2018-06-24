@@ -6,7 +6,7 @@ sealed abstract case class Price(private val value: BigDecimal) {
   override def toString: String = f"$value%2.2f"
 
   def *(rate: Rate): Price = {
-    map(_  * (rate.percentage / 100))
+    map(_ * (rate.percentage / 100))
   }
 
   def map(f: BigDecimal => BigDecimal): Price = {
@@ -16,7 +16,7 @@ sealed abstract case class Price(private val value: BigDecimal) {
 
 object Price {
   def apply(value: BigDecimal): Price = {
-    new Price(value.setScale(2, BigDecimal.RoundingMode.HALF_UP)){}
+    new Price(value.setScale(2, BigDecimal.RoundingMode.HALF_UP)) {}
   }
 
   implicit val binders: Binders[Price] = Binders.bigDecimal.xmap(v => apply(v), _.value)

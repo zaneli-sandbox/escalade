@@ -3,7 +3,7 @@ package com.zaneli.escalade.api.repository
 import com.zaneli.escalade.api.entity._
 import com.zaneli.escalade.api.repository.Result.InsertSuccess
 import db.DBSetup
-import org.specs2.mutable.{After, Specification}
+import org.specs2.mutable.{ After, Specification }
 import scalikejdbc._
 import scalikejdbc.specs2.mutable.AutoRollback
 
@@ -22,8 +22,7 @@ class OrderDetailRepositorySpec extends Specification with DBSetup {
       val id = OrderSummaryId(1L)
       repo.findBySummaryId(id).sortBy(_.itemId) must_== List(
         OrderDetailEntity(id, ItemId(1L), 10, Rate(10), Price(900)),
-        OrderDetailEntity(id, ItemId(2L), 5, Rate(3), Price(727.5))
-      )
+        OrderDetailEntity(id, ItemId(2L), 5, Rate(3), Price(727.5)))
     }
     "存在しないSummaryIDを指定" in new AutoRollbackWithFixture {
       repo.findBySummaryId(OrderSummaryId(-1L)).sortBy(_.itemId) must beEmpty
@@ -45,8 +44,7 @@ class OrderDetailRepositorySpec extends Specification with DBSetup {
       val id = OrderSummaryId(1L)
       val initials = List(
         OrderDetailEntity(id, ItemId(1L), 10, Rate(10), Price(900)),
-        OrderDetailEntity(id, ItemId(2L), 5, Rate(3), Price(727.5))
-      )
+        OrderDetailEntity(id, ItemId(2L), 5, Rate(3), Price(727.5)))
       repo.findBySummaryId(id).sortBy(_.itemId) must_== initials
 
       val entity = OrderDetailEntity(id, ItemId(1L), 5, Rate(3), Price(727.5))
