@@ -8,6 +8,7 @@ import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.circe.Circe
 import play.api.mvc.{ AbstractController, ControllerComponents }
+import skinny.orm.exception.OptimisticLockException
 
 class CompanyController @Inject() (
   cc: ControllerComponents,
@@ -36,7 +37,10 @@ class CompanyController @Inject() (
 
   def edit(id: Long) = Action(circe.json[CompanyEntity with HasId[CompanyId] with HasVersion]) { implicit req =>
     service.save(req.body).fold(
-      t => BadRequest(t.getMessage),
+      {
+        case t: OptimisticLockException => Conflict(t.message)
+        case t => BadRequest(t.getMessage)
+      },
       {
         case r @ Result.InsertSuccess(id) =>
           logger.warn(s"unexpected result: $r")
